@@ -1,5 +1,4 @@
 from tkinter import *
-from time import sleep
 from copy import deepcopy
 
 x = 400/9
