@@ -1,9 +1,11 @@
 from tkinter import *
+from time import sleep
 from copy import deepcopy
 
 x = 400/9
 y = 400/9
-
+time = 0.2
+colors = [['0']*3+['1']*3+['0']*3]*3+[['1']*3+['0']*3+['1']*3]*3+[['0']*3+['1']*3+['0']*3]*3
 def nextEmpty(b):
 	for i in range(9):
 		if ' ' in b[i]:
@@ -30,8 +32,6 @@ def isvalid(b, num, pos):
 def solve(b, b1):
 	position = nextEmpty(b)
 	if not position:
-		draw_sudoku(b, b1, x, y)
-		print('Solved')
 		return True
 	
 	for i in range(1, 10):
@@ -39,46 +39,53 @@ def solve(b, b1):
 			s = position[0]
 			t = position[1]
 			b[s][t] = i
+			x1 = t*x+2
+			y1 = s*y+2
+			x2 = x1 + x
+			y2 = y1 + y
+			sleep(time)
+			rect1 = c.create_rectangle(x1, y1, x2, y2, width=4, outline='green2')
+			d = c.create_text((x1+x2)/2, (y1+y2)/2, text=str(b[s][t]), font=("Helvetica", "18"))
+			
+			c.update()
+			c.delete(rect1)
 			if solve(b, b1):
 				return True
 			b[s][t] = ' '
+			
+			rect2 = c.create_rectangle(x1+x, y1, x2+x, y2, width=4, outline='red')
+			if i < 9:
+				r = c.create_text((x1+x2+x+x)/2, (y1+y2)/2, text=str(i+1), font=("Helvetica", "18"))
+			else :
+				r = c.create_text((x1+x2+x+x)/2, (y1+y2)/2, text=str(1), font=("Helvetica", "18"))
+			sleep(time)
+			c.update()
+			c.delete(rect2)
+			c.delete(d)
+			c.delete(r)
 	return False
 
 
-def draw_sudoku(b, b1, x, y):
-	r1 = Tk()
-	r1.resizable(False, False)
-	c = Canvas(r1, height=400, width=400)
-	c.pack()
-	for i in range(9):
-		for j in range(9):
-			x1 = i*x+2
-			y1 = j *y+2
-			x2 = x1 + x
-			y2 = y1 + y
-			if b1[j][i]!= ' ':
-				c.create_rectangle(x1, y1, x2, y2, fill='lightblue', width=2)
-				c.create_text((x1+x2)/2, (y1+y2)/2, text=str(b[j][i]), font=("Helvetica", "18", "bold"))
-			else :
-				c.create_rectangle(x1, y1, x2, y2, width=2)
-				c.create_text((x1+x2)/2, (y1+y2)/2, text=str(b[j][i]), font=("Helvetica", "18"))
-	r1.mainloop()
 
 
-def start(num):
-	sudoku = [ ['']*9 for i in range(9) ]
+
+def start(num, root, skip_button):
+	global time
 	for i in range(9):
 		for j in range(9):
 		    s = num[i][j].get()
 		    if s == "":
-		        sudoku[i][j] = ' '
+		        b[i][j] = ' '
 		    else:
-		        sudoku[i][j] = int(s)
-	default = deepcopy(sudoku)
-	if solve(sudoku, default):
-		print('Solved')
-	else :
-		print('Not Solvable')
+		        b[i][j] = int(s)
+	if skip_button.get() == 1 :
+		time = 0
+	else:
+		time = 0.3
+	print(skip_button.get())
+
+	root.destroy()
+	
 
 
 def initiate():
@@ -94,15 +101,56 @@ def initiate():
 			x2 = x1 + x
 			y2 = y1 + y
 			num[j][i] = StringVar()
-			e = Entry (root, width=3, textvariable=num[j][i], bg='lightblue', justify="center", font=("Helvetica", "15", "bold"))
+			if colors[j][i] == '0' :
+				e = Entry (root, width=3, textvariable=num[j][i], bg='lightblue', justify="center", font=("Helvetica", "15", "bold"))
+			else :
+				e = Entry (root, width=3, textvariable=num[j][i], bg='blanchedalmond', justify="center", font=("Helvetica", "15", "bold"))
 			e.place(x=x1, y=y1)
-
-	submit = Button(canvas, text='Solve', command=lambda:start(num))
-	submit.place(x = 180, y=410)
+	skip_button = IntVar()
+	Checkbutton(root, text="Skip showing steps", variable=skip_button).place(x = 150, y=402)
+	submit = Button(canvas, text='Solve', command=lambda:start(num, root, skip_button))
+	submit.place(x = 180, y=420)
 
 	root.mainloop()
 
 
+b = [ ['']*9 for i in range(9) ]
+
 initiate()
+b1 = deepcopy(b) 
+r1 = Tk()
+c = Canvas(r1, height=400, width=400)
+c.pack()
+for i in range(9):
+	for j in range(9):
+		x1 = i*x+2
+		y1 = j *y+2
+		x2 = x1 + x
+		y2 = y1 + y
+		if colors[j][i] == '0' :
+			c.create_rectangle(x1, y1, x2, y2, fill='lightblue', width=2)
+		else:
+			c.create_rectangle(x1, y1, x2, y2, fill='antiquewhite', width=2)
+		if b1[j][i]!= ' ':
+			c.create_text((x1+x2)/2, (y1+y2)/2, text=str(b[j][i]), font=("Helvetica", "20", "bold"))
+		else :
+			c.create_text((x1+x2)/2, (y1+y2)/2, text=str(b[j][i]), font=("Helvetica", "18"))
+
+c.create_line(4,0,4,400, width=4)
+c.create_line(x*3,0,x*3,400, width=4)
+c.create_line(x*6,0,x*6,400, width=4)
+c.create_line(x*9,0,x*9,400, width=4)
+
+c.create_line(0, 4, 400, 4, width=4)
+c.create_line(0, y*3, 400, y*3, width=4)
+c.create_line(0, y*6, 400, y*6, width=4)
+c.create_line(0, y*9, 400, y*9, width=4)
+
+if solve(b, b1):
+	print('Solved')
+else :
+	print('Not Solvable')
+r1.mainloop()
+
+
 input()
- 
