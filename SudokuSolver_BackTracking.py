@@ -246,5 +246,3 @@ while retry:
 	MsgBox = tkinter.messagebox.askquestion(title='retry', message='Do you want to try again ?')
 	if MsgBox == 'no':
 		retry = False
-
-input()
