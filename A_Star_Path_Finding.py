@@ -228,9 +228,9 @@ def main():
 	canvas.bind('<Button-3>', lambda event, canvas=canvas:set_start_and_end(event, canvas))
 	canvas.bind('<B1-Motion>', lambda event, canvas=canvas:draw_maze(event, canvas))
 
-	label1 = Label(canvas, text='Step 1) Mouse Left click to set starting and ending points', font=("Helvetica", "10"))
+	label1 = Label(canvas, text='Step 1) Mouse Right click to set starting and ending points', font=("Helvetica", "10"))
 	label1.place(x=50, y=405)
-	label2 = Label(canvas, text='Step 2) Hold and drag with mouse right click to draw maze', font=("Helvetica", "10"))
+	label2 = Label(canvas, text='Step 2) Hold and drag with mouse left click to draw maze', font=("Helvetica", "10"))
 	label2.place(x=50, y=425)
 
 	next_button = Button(canvas, text='Solve', command=lambda:start_solve(root, canvas))
